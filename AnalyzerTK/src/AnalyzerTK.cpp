@@ -135,7 +135,6 @@ int main(int argc, char **argv) {
 		t1 = (double) cvGetTickCount();
 
 		vRegions.clear();
-		vObjIdList.clear();
 		IplImage img = IplImage(frame);
 		nHeads = detect->detectObject(&img, vRegions);
 		if (detection_state == nCurrState) {
