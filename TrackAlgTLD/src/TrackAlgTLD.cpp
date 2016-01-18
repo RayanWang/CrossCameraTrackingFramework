@@ -189,12 +189,12 @@ bool CTrackAlgTLD::willKeepTracking(string& objId, bool* pbKeepTrack) {
 
 		m_mapTrack.erase(objId);
 		if (pbKeepTrack)
-			*pbKeepTrack = true;
+			*pbKeepTrack = false;
 		return true;
 	}
 
 	if (pbKeepTrack)
-		*pbKeepTrack = false;
+		*pbKeepTrack = true;
 
 	return true;
 }
