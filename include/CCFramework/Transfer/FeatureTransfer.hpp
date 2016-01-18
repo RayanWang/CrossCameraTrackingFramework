@@ -47,6 +47,7 @@ public:
 			m_pShmCamera(NULL),
 			m_cbRecv(NULL),
 			m_userData(NULL) {
+        shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
 	}
 	~FeatureTransfer();
 
@@ -321,13 +322,8 @@ inline bool FeatureTransfer::sendFeatureToAll(int32_t fromCamId, uuid& objId,
 
 inline bool FeatureTransfer::startRecvFeatures() {
 	try {
-		shared_memory_object shmCamera(open_only,
-				(const char*) ConvertToString(m_cameraId).c_str(), read_write);
-		mapped_region regionCamera(shmCamera, read_write);
-		shm_Camera* feature = static_cast<shm_Camera*>(regionCamera.get_address());
-
 		recvPackage pack;
-		pack.feature = feature;
+		pack.feature = m_pShmCamera;
 		pack.transfer = this;
 
 		pthread_create(&m_recvThread, NULL, recvFeatures, &pack);
