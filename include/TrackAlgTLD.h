@@ -85,14 +85,14 @@ public:
 
 	bool addTracking(std::string& objId);
 
-	bool mergeTracking(IplImage *img, CvRect detectedBox, bool* pbMerged);
+	bool mergeTracking(IplImage *img, CvRect detectedBox);
 
 	bool willKeepTracking(std::string& objId, bool* pbKeepTrack);
 
 	bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, void* feature,
 			void* pFeatureDesc = NULL);
 
-	bool identifyObject(std::string& objId, IplImage *img, int32_t& cameraId,
+	bool identifyObject(std::string& objId, IplImage *img, CvRect detectedBox, int32_t& cameraId,
 			std::string& objIdFromOthers);
 
 	void setObjLeaveCallback(std::string& objId, cbTrackCallback cbTrack, void* userData);

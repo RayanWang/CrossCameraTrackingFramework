@@ -25,6 +25,7 @@ public:
 	~CrossCameraManager();
 
 	bool initManagerData(int32_t totCameraNum, int32_t maxNumOfTarget);
+	void releaseManagerData();
 
 	error_code_transfer getTransferError() const { return m_transferErrorCode; }
 	error_code_t getboostError() const { return m_boostErrorCode; }
@@ -60,6 +61,10 @@ inline bool CrossCameraManager::initManagerData(int32_t totCameraNum, int32_t ma
 	}
 
 	return false;
+}
+
+inline void CrossCameraManager::releaseManagerData() {
+	shared_memory_object::remove(CrossCameraCenter);
 }
 
 }

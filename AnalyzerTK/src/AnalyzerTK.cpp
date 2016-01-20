@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	FeatureTransfer transfer;
+	FeatureTransfer transfer(g_CameraId);
 	if (!transfer.initTransfer()) {
 		error_code_transfer error = transfer.getTransferError();
 		cout << "--(!) Transfer init error" << error << endl;
@@ -188,25 +188,23 @@ int main(int argc, char **argv) {
 			vTrackObj.clear();
 			//---------------------------- end tracking -----------------------------
 
-			bool bObjFromOtherCam = false;
-			if (pTKAlg->isAnyObjToIdendify()) {
-				int32_t cameraId = 1 >> 31;
-				string objId;
-				for (uint32_t i = 0; i < vObjIdList.size(); ++i) {
-					if (pTKAlg->identifyObject(vObjIdList[i], &img, cameraId, objId)) {
-						bObjFromOtherCam = true;
-						printf(
-								"[AnalyzerTK][main] The target in camera %d with id %s is from camera %d with id %s\n",
-								g_CameraId, vObjIdList[i].c_str(), cameraId,
-								objId.c_str());
+			for (int32_t i = 0; i < nHeads; ++i) {
+				bool bObjFromOtherCam = false;
+				if (pTKAlg->isAnyObjToIdendify()) {
+					int32_t cameraId = 1 >> 31;
+					string objId;
+					for (uint32_t j = 0; j < vObjIdList.size(); ++j) {
+						if (pTKAlg->identifyObject(vObjIdList[j], &img, vRegions[i], cameraId, objId)) {
+							bObjFromOtherCam = true;
+							printf(
+									"[AnalyzerTK][main] The target in camera %d with id %s is from camera %d with id %s\n",
+									g_CameraId, vObjIdList[i].c_str(), cameraId,
+									objId.c_str());
+						}
 					}
 				}
-			}
 
-			for (int32_t i = 0; i < nHeads; ++i) {
-				bool bMerged = true;
-				if (!bObjFromOtherCam && pTKAlg->mergeTracking(&img, vRegions[i], &bMerged)) {
-					if (!bMerged) {
+				if (!bObjFromOtherCam && !pTKAlg->mergeTracking(&img, vRegions[i])) {
 						uuid objId = random_generator()();
 						string strObjId = boost::lexical_cast<string>(objId);
 						pTKAlg->addTracking(strObjId);
@@ -217,7 +215,6 @@ int main(int argc, char **argv) {
 							goto exit;
 						else
 							pTKAlg->setObjLeaveCallback(strObjId, sendData, &transfer);
-					}
 				}
 			}
 		}

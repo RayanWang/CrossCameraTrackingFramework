@@ -50,14 +50,14 @@ public:
 
 	virtual bool addTracking(std::string& objId)  = 0;
 
-	virtual bool mergeTracking(IplImage *img, CvRect detectedBox, bool* pbMerged) = 0;
+	virtual bool mergeTracking(IplImage *img, CvRect detectedBox) = 0;
 
 	virtual bool willKeepTracking(std::string& objId, bool* pbKeepTrack) = 0;
 
 	virtual bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, void* feature,
 			void* pFeatureDesc = NULL) = 0;
 
-	virtual bool identifyObject(std::string& objId, IplImage *img,
+	virtual bool identifyObject(std::string& objId, IplImage *img, CvRect detectedBox,
 			int32_t& cameraId, std::string& objIdFromOthers) = 0;
 
 	virtual void setObjLeaveCallback(std::string& objId, cbTrackCallback cbTrack, void* userData) = 0;

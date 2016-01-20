@@ -114,9 +114,14 @@ bool CTrackAlgTLD::addTracking(string& objId) {
 	return insertResult.second;
 }
 
-bool CTrackAlgTLD::mergeTracking(IplImage *img, CvRect DetectedBox, bool* pbMerged) {
+bool CTrackAlgTLD::mergeTracking(IplImage *img, CvRect DetectedBox) {
 	if (m_mapTrack.empty()) {
 		m_errCode = no_tracking_obj;
+		return false;
+	}
+
+	if (!img) {
+		m_errCode = invalid_arg;
 		return false;
 	}
 
@@ -142,8 +147,6 @@ bool CTrackAlgTLD::mergeTracking(IplImage *img, CvRect DetectedBox, bool* pbMerg
 			if ((tldOverlapRectRect(detect, *it->second->tld->currBB) > m_OverlapThreshold
 					&& intersectionRatio(bb1, bb2) > m_IntersectionThreshold)
 					|| tldIsInside(bb1, bb2) || tldIsInside(bb2, bb1)) {
-				if (pbMerged)
-					*pbMerged = true;
 				return true;
 			}
 		}
@@ -164,11 +167,8 @@ bool CTrackAlgTLD::mergeTracking(IplImage *img, CvRect DetectedBox, bool* pbMerg
 			confident = tmp;
 	}
 
-	if (confident > m_MergeThreshold) {
-		if (pbMerged)
-			*pbMerged = true;
+	if (confident > m_MergeThreshold)
 		return true;
-	}
 
 	return false;
 }
@@ -239,16 +239,20 @@ bool CTrackAlgTLD::setObjectFeatures(int32_t cameraId, string& objIdFromOthers, 
 	return true;
 }
 
-bool CTrackAlgTLD::identifyObject(string& objId, IplImage *img, int32_t& cameraId,
+bool CTrackAlgTLD::identifyObject(string& objId, IplImage *img, CvRect detectedBox, int32_t& cameraId,
 		string& objIdFromOthers) {
 	if (m_mapTrack.find(objId) != m_mapTrack.end()) {
 		if (false == m_mapTrack[objId]->isCheckedBefore()) { // satisfied at the beginning
-			m_mapTrack[objId]->setChecked(true);
+			Rect detect;
+			detect.x = detectedBox.x;
+			detect.y = detectedBox.y;
+			detect.width = detectedBox.width;
+			detect.height = detectedBox.height;
 
 			Mat grey;
 			cvtColor(cvarrToMat(img), grey, CV_BGR2GRAY);
 			float f = m_mapTrack[objId]->tld->nnClassifier->classifyFromOtherView(m_mapRecvFeatures,
-							grey, m_mapTrack[objId]->tld->currBB, cameraId, objIdFromOthers);
+							grey, &detect, cameraId, objIdFromOthers);
 			printf("[TrackAlgTLD][identifyObject] Confident: %f, id: %s\n", f, objIdFromOthers.c_str());
 
 			if (f >= m_MergeThreshold) {
@@ -258,6 +262,7 @@ bool CTrackAlgTLD::identifyObject(string& objId, IplImage *img, int32_t& cameraI
 				}
 				m_mapRecvFeatures.erase(objIdFromOthers);
 
+				m_mapTrack[objId]->setChecked(true);
 				return true;
 			}
 		} else

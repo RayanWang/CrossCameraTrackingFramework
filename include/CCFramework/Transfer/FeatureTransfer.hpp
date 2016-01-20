@@ -33,7 +33,6 @@ typedef void (*recvFeature)(int32_t, uuid, void*, uint32_t, void*, uint32_t, voi
  */
 class FeatureTransfer {
 public:
-	FeatureTransfer();
 	FeatureTransfer(const int32_t cameraId) :
 			m_TotCameraNum(0),
 			m_MaxNumOfTarget(0),
@@ -47,21 +46,25 @@ public:
 			m_pShmCamera(NULL),
 			m_cbRecv(NULL),
 			m_userData(NULL) {
-        shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
+		shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
 	}
-	~FeatureTransfer();
+	~FeatureTransfer() {
+		shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
+	}
 
 	bool initTransfer();
 	bool sendFeatureToAll(int32_t fromCamId, uuid& objId, void* feature,
 			uint32_t featureSizeInByte, void* pDesc = NULL, uint32_t descSizeInByte = 0);
-	bool startRecvFeatures();
+	void startRecvFeatures() { pthread_create(&m_recvThread, NULL, recvFeatures, this); }
 	void setRecvCallback(recvFeature callback, void* userData) {
 		m_cbRecv = callback;
 		m_userData = userData;
 	}
 	static void* recvFeatures(void* lpParam);
-	void stopRecvFeatures();
-
+	void stopRecvFeatures() {
+		pthread_cancel(m_recvThread);
+		pthread_join(m_recvThread, NULL);
+	}
 	error_code_transfer getTransferError() const { return m_transferErrorCode; }
 	error_code_t getboostError() const { return m_boostErrorCode; }
 
@@ -92,14 +95,14 @@ private:
 		bool* checkList;
 	};
 
-	struct DataQueue {
-		DataQueue() :
+	struct circularQueueueue {
+		circularQueueueue() :
 				flag(0),
 				capacity(0),
 				front(-1),
 				rear(-1) {
 		}
-		~DataQueue() {
+		~circularQueueueue() {
 		}
 
 		void init(int32_t queueSize, char* queueStartAddr) {
@@ -160,7 +163,7 @@ private:
 	struct shm_Camera {
 		shm_Camera(int32_t capacity, char* queueStartAddr) :
 				sem_camera(1) {
-			dataQ.init(capacity, queueStartAddr);
+			circularQueue.init(capacity, queueStartAddr);
 		}
 		~shm_Camera() {
 		}
@@ -168,14 +171,9 @@ private:
 		//Semaphores to protect and synchronize access
 		interprocess_semaphore sem_camera;
 
-		DataQueue dataQ;
+		circularQueueueue circularQueue;
 	};
 #pragma pack(pop)
-
-	struct recvPackage {
-		shm_Camera* feature;
-		FeatureTransfer* transfer;
-	};
 
 	uint32_t m_TotCameraNum;
 	uint32_t m_MaxNumOfTarget;
@@ -197,25 +195,6 @@ private:
 		return ss.str();
 	}
 };
-
-inline FeatureTransfer::FeatureTransfer() :
-		m_TotCameraNum(0),
-		m_MaxNumOfTarget(0),
-		m_descSizeInByte(0),
-		m_featureSizeInByte(0),
-		m_checkListSize(0),
-		m_cameraId(1 >> 31),
-		m_transferErrorCode(unknown),
-		m_boostErrorCode(no_error),
-		m_recvThread(0),
-		m_pShmCamera(NULL),
-		m_cbRecv(NULL),
-		m_userData(NULL) {
-}
-
-inline FeatureTransfer::~FeatureTransfer() {
-	shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
-}
 
 inline bool FeatureTransfer::initTransfer() {
 	try {
@@ -302,7 +281,7 @@ inline bool FeatureTransfer::sendFeatureToAll(int32_t fromCamId, uuid& objId,
 			memset(&header, 0, sizeof(header));
 			header.fromCameraId = fromCamId;
 			memcpy(&header.objId, &objId, sizeof(uuid));
-			if (!feature->dataQ.enqueue(header)) {
+			if (!feature->circularQueue.enqueue(header)) {
 				cout << "Failed to send data to camera " << i << endl;
 				m_transferErrorCode = buffer_full_error;
 				feature->sem_camera.post();
@@ -320,34 +299,17 @@ inline bool FeatureTransfer::sendFeatureToAll(int32_t fromCamId, uuid& objId,
 	return false;
 }
 
-inline bool FeatureTransfer::startRecvFeatures() {
-	try {
-		recvPackage pack;
-		pack.feature = m_pShmCamera;
-		pack.transfer = this;
-
-		pthread_create(&m_recvThread, NULL, recvFeatures, &pack);
-
-		return true;
-	} catch (interprocess_exception& e) {
-		m_transferErrorCode = boost_shm_error;
-		m_boostErrorCode = e.get_error_code();
-	}
-
-	return false;
-}
-
 inline void* FeatureTransfer::recvFeatures(void* lpParam) {
-	recvPackage* pack = (recvPackage*) lpParam;
-	if (pack && pack->feature) {
+	FeatureTransfer* transfer = (FeatureTransfer*) lpParam;
+	if (transfer && transfer->m_pShmCamera) {
 		while (true) {
 			pthread_testcancel();
 
-			pack->feature->sem_camera.wait();
+			transfer->m_pShmCamera->sem_camera.wait();
 			FeatureHeader header;
 			memset(&header, 0, sizeof(header));
-			bool bRet = pack->feature->dataQ.dequeue(&header);
-			pack->feature->sem_camera.post();
+			bool bRet = transfer->m_pShmCamera->circularQueue.dequeue(&header);
+			transfer->m_pShmCamera->sem_camera.post();
 
 			if (bRet) {
 				string strCamId = ConvertToString(header.fromCameraId);
@@ -360,21 +322,21 @@ inline void* FeatureTransfer::recvFeatures(void* lpParam) {
 					mapped_region regionFeature(shmFeature, read_write);
 
 					char* recvDesc = static_cast<char*>(regionFeature.get_address()) +
-							sizeof(FeatureData) + pack->transfer->m_checkListSize * sizeof(bool);
-					char* recvFeature = recvDesc + pack->transfer->m_descSizeInByte;
+							sizeof(FeatureData) + transfer->m_checkListSize * sizeof(bool);
+					char* recvFeature = recvDesc + transfer->m_descSizeInByte;
 
-					pack->transfer->m_cbRecv(header.fromCameraId, header.objId,
-							recvFeature, pack->transfer->m_featureSizeInByte,
-							recvDesc, pack->transfer->m_descSizeInByte,
-							pack->transfer->m_userData);
+					transfer->m_cbRecv(header.fromCameraId, header.objId,
+							recvFeature, transfer->m_featureSizeInByte,
+							recvDesc, transfer->m_descSizeInByte,
+							transfer->m_userData);
 
 					pthread_testcancel();
 					FeatureData* data = static_cast<FeatureData*>(regionFeature.get_address());
 
 					data->sem_feature.wait();
-					data->checkList[pack->transfer->m_cameraId] = true;
+					data->checkList[transfer->m_cameraId] = true;
 					bool bRemoveShm = true;
-					for (int32_t i = 0; i < pack->transfer->m_checkListSize; ++i)
+					for (int32_t i = 0; i < transfer->m_checkListSize; ++i)
 						if (data->checkList[i] == false) {
 							bRemoveShm = false;
 							break;
@@ -384,23 +346,17 @@ inline void* FeatureTransfer::recvFeatures(void* lpParam) {
 					if (bRemoveShm)
 						shared_memory_object::remove((const char*) strFeatureShm.c_str());
 				} catch (interprocess_exception& e) {
-					pack->transfer->m_transferErrorCode = boost_shm_error;
-					pack->transfer->m_boostErrorCode = e.get_error_code();
+					transfer->m_transferErrorCode = boost_shm_error;
+					transfer->m_boostErrorCode = e.get_error_code();
 				}
 			} else
-				pack->transfer->m_transferErrorCode = no_data_error;
+				transfer->m_transferErrorCode = no_data_error;
 
 			usleep(100000);
 		}
 	}
 
 	pthread_exit(0);
-}
-
-inline void FeatureTransfer::stopRecvFeatures() {
-	pthread_cancel(m_recvThread);
-
-	pthread_join(m_recvThread, NULL);
 }
 
 } // namespace transfer
