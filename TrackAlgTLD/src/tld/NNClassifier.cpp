@@ -102,24 +102,24 @@ float NNClassifier::classifyWindow(const Mat &img, int windowIdx) {
 	return classifyPatch(&patch);
 }
 
-float NNClassifier::classifyFromOtherView(std::map<std::string, TldFeature*> &mapPositiveSamples,
+float NNClassifier::classifyFromOtherView(map<string, shared_ptr<TldFeature> > &mapPositiveSamples,
 		const Mat &img,
 		Rect *bb,
 		int32_t& cameraId,
-		std::string& objIdFromOthers) {
+		string& objIdFromOthers) {
 	NormalizedPatch patch;
 
 	tldExtractNormalizedPatchRect(img, bb, patch.values);
 
 	float distance = 0;
 
-	map<std::string, TldFeature*>::iterator it;
+	map<string, shared_ptr<TldFeature> >::iterator it;
 	for (it = mapPositiveSamples.begin(); it != mapPositiveSamples.end(); ++it) {
 		float ccorr_max_p = 0;
 
 		//Compare patch to positive patches
 		for (size_t i = 0; i < it->second->vTruePositives->size(); i++) {
-			float ccorr = ncc(it->second->vTruePositives->at(i), patch.values);
+			float ccorr = ncc(it->second->vTruePositives->at(i).get(), patch.values);
 
 			if (ccorr > ccorr_max_p) {
 				ccorr_max_p = ccorr;
@@ -133,7 +133,7 @@ float NNClassifier::classifyFromOtherView(std::map<std::string, TldFeature*> &ma
 
 		//Compare patch to negative patches
 		for (size_t i = 0; i < it->second->vFalsePositives->size(); i++) {
-			float ccorr = ncc(it->second->vFalsePositives->at(i), patch.values);
+			float ccorr = ncc(it->second->vFalsePositives->at(i).get(), patch.values);
 
 			if (ccorr > ccorr_max_n) {
 				ccorr_max_n = ccorr;

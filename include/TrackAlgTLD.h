@@ -10,6 +10,7 @@
 
 
 #include <vector>
+#include <memory>
 
 #include "TrackAlg.h"
 
@@ -111,8 +112,8 @@ private:
 
 	int32_t m_KeepTrackingTime;
 
-	mutable std::map<std::string, Main*> m_mapTrack;
-	std::map<std::string, TldFeature*> m_mapRecvFeatures;
+	mutable std::map<std::string, std::shared_ptr<Main> > m_mapTrack;
+	std::map<std::string, std::shared_ptr<TldFeature> > m_mapRecvFeatures;
 };
 
 

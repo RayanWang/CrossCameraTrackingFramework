@@ -31,7 +31,7 @@ public:
 	float classifyPatch(NormalizedPatch *patch);
 	float classifyBB(const cv::Mat &img, cv::Rect *bb);
 	float classifyWindow(const cv::Mat &img, int windowIdx);
-	float classifyFromOtherView(std::map<std::string, TldFeature*> &mapPositiveSamples,
+	float classifyFromOtherView(std::map<std::string, std::shared_ptr<TldFeature> > &mapPositiveSamples,
 			const cv::Mat &img,
 			cv::Rect *bb,
 			int32_t& cameraId,

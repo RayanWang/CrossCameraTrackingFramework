@@ -10,31 +10,23 @@
 
 
 #include <vector>
+#include <memory>
 
 class TldFeature {
 public:
 	TldFeature() :
 		cameraId(1 >> 31) {
-		vFalsePositives = new std::vector<float*>();
-		vTruePositives = new std::vector<float*>();
+		vFalsePositives = std::make_shared<std::vector<std::unique_ptr<float[]> > >();
+		vTruePositives = std::make_shared<std::vector<std::unique_ptr<float[]> > >();
 	}
 	~TldFeature() {
-		for (uint32_t i = 0; i < vFalsePositives->size(); ++i)
-			if (vFalsePositives->at(i))
-				delete vFalsePositives->at(i);
 		vFalsePositives->clear();
-		delete vFalsePositives;
-
-		for (uint32_t i = 0; i < vTruePositives->size(); ++i)
-			if (vTruePositives->at(i))
-				delete vTruePositives->at(i);
 		vTruePositives->clear();
-		delete vTruePositives;
 	}
 
 	int32_t cameraId;
-	std::vector<float*>* vFalsePositives;
-	std::vector<float*>* vTruePositives;
+	std::shared_ptr<std::vector<std::unique_ptr<float[]> > > vFalsePositives;
+	std::shared_ptr<std::vector<std::unique_ptr<float[]> > > vTruePositives;
 };
 
 

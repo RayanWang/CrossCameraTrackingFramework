@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 	string strDetectionModelPath;
 	string strVideoPath;
 	TldParam tldParam;
-	TrackingGenerate* pTrackGen = new TrackingGenerate;
+	std::shared_ptr<TrackingGenerate> pTrackGen = make_shared<TrackingGenerate>();
 
 	int c;
 	while ((c = getopt(argc, argv, "c:k:l:r:v:o:a:m:")) != -1) {
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	adaboostDetect* detect = new adaboostDetect(strDetectionModelPath,
+	std::shared_ptr<adaboostDetect> detect = make_shared<adaboostDetect>(strDetectionModelPath,
 			CV_HAAR_SCALE_IMAGE, 3, 20, 30, 1.1);
 	CTrackAlg* pTKAlg = pTrackGen->CreateTrackingObject();
 
@@ -228,8 +228,6 @@ int main(int argc, char **argv) {
 exit:
 	pTKAlg->release();
 	delete pTKAlg;
-	delete detect;
-	delete pTrackGen;
 
 	RELEASE_RUNTIME(CTrackAlgTLD)
 

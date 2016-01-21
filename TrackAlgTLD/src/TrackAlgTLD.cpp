@@ -47,24 +47,15 @@ bool CTrackAlgTLD::init(void* pParam) {
 	m_KeepTrackingTime = param->keepTrackingTime;
 
 	for (uint32_t i = 0; i < param->initTargetNum; ++i) {
-		Main *pMain = new Main();
-		pMain->setTrivialObjId(m_TrivialObjId++);
-
-		m_mapTrack.insert(pair<string, Main*>(param->vInitObjIdList[i], pMain));
+		m_mapTrack.insert(pair<string, shared_ptr<Main> >(param->vInitObjIdList[i], make_shared<Main>()));
+		m_mapTrack[param->vInitObjIdList[i]]->setTrivialObjId(m_TrivialObjId++);
 	}
 
 	return true;
 }
 
 void CTrackAlgTLD::release(void) {
-	map<string, Main*>::iterator it;
-	for (it = m_mapTrack.begin(); it != m_mapTrack.end(); it++)
-		delete it->second;
 	m_mapTrack.clear();
-
-	map<string, TldFeature*>::iterator it_feature;
-	for (it_feature = m_mapRecvFeatures.begin(); it_feature != m_mapRecvFeatures.end(); it_feature++)
-		delete it_feature->second;
 	m_mapRecvFeatures.clear();
 }
 
@@ -103,13 +94,12 @@ void CTrackAlgTLD::endTracking(string& objId) {
 }
 
 bool CTrackAlgTLD::addTracking(string& objId) {
-	Main *pMain = new Main();
-	pMain->setTrivialObjId(m_TrivialObjId++);
-
-	pair<map<string, Main*>::iterator, bool> insertResult;
-	insertResult = m_mapTrack.insert(pair<string, Main*>(objId, pMain));
+	pair<map<string, shared_ptr<Main> >::iterator, bool> insertResult;
+	insertResult = m_mapTrack.insert(pair<string, shared_ptr<Main> >(objId, make_shared<Main>()));
 	if (!insertResult.second)
 		m_errCode = already_exist_error;
+	else
+		m_mapTrack[objId]->setTrivialObjId(m_TrivialObjId++);
 
 	return insertResult.second;
 }
@@ -136,7 +126,7 @@ bool CTrackAlgTLD::mergeTracking(IplImage *img, CvRect DetectedBox) {
 
 	float confident = 0;
 	float tmp = 0;
-	map<string, Main*>::iterator it;
+	map<string, shared_ptr<Main> >::iterator it;
 	for (it = m_mapTrack.begin(); it != m_mapTrack.end(); it++) {
 		if (it->second->tld->currBB) {
 			int bb1[4];
@@ -183,10 +173,6 @@ bool CTrackAlgTLD::willKeepTracking(string& objId, bool* pbKeepTrack) {
 		m_mapTrack[objId]->resetRemovingCount();
 
 		m_mapTrack[objId]->endWork();
-
-		delete m_mapTrack[objId];
-		m_mapTrack[objId] = NULL;
-
 		m_mapTrack.erase(objId);
 		if (pbKeepTrack)
 			*pbKeepTrack = false;
@@ -212,28 +198,26 @@ bool CTrackAlgTLD::setObjectFeatures(int32_t cameraId, string& objIdFromOthers, 
 
 	int32_t eachElementSize = desc->eachElementSize;	// TLD_PATCH_SIZE * TLD_PATCH_SIZE
 	for (int32_t i = 0; i < desc->splitIndex; ++i) {
-		float* pTruePositive = new float[eachElementSize];
+		unique_ptr<float[]> spTruePositive(new float[eachElementSize]);
 		for (int32_t j = 0; j < eachElementSize; ++j)
-			pTruePositive[j] = objFeature[i * eachElementSize + j];
+			spTruePositive[j] = objFeature[i * eachElementSize + j];
 		if (m_mapRecvFeatures.find(objIdFromOthers) == m_mapRecvFeatures.end()) {
-			TldFeature* samples = new TldFeature();
-			samples->cameraId = cameraId;
-			samples->vTruePositives->push_back(pTruePositive);
-			m_mapRecvFeatures.insert(pair<string, TldFeature*>(objIdFromOthers, samples));
-		} else
-			m_mapRecvFeatures[objIdFromOthers]->vTruePositives->push_back(pTruePositive);
+			m_mapRecvFeatures.insert(pair<string, shared_ptr<TldFeature> >(objIdFromOthers,
+					make_shared<TldFeature>()));
+			m_mapRecvFeatures[objIdFromOthers]->cameraId = cameraId;
+		}
+		m_mapRecvFeatures[objIdFromOthers]->vTruePositives->push_back(move(spTruePositive));
 	}
 	for (int32_t i = desc->splitIndex; i < desc->totFeatureSize; ++i) {
-		float* pFalsePositive = new float[eachElementSize];
+		unique_ptr<float[]> spFalsePositive(new float[eachElementSize]);
 		for (int32_t j = 0; j < eachElementSize; ++j)
-			pFalsePositive[j] = objFeature[i * eachElementSize + j];
+			spFalsePositive[j] = objFeature[i * eachElementSize + j];
 		if (m_mapRecvFeatures.find(objIdFromOthers) == m_mapRecvFeatures.end()) {
-			TldFeature* samples = new TldFeature();
-			samples->cameraId = cameraId;
-			samples->vFalsePositives->push_back(pFalsePositive);
-			m_mapRecvFeatures.insert(pair<string, TldFeature*>(objIdFromOthers, samples));
-		} else
-			m_mapRecvFeatures[objIdFromOthers]->vFalsePositives->push_back(pFalsePositive);
+			m_mapRecvFeatures.insert(pair<string, shared_ptr<TldFeature> >(objIdFromOthers,
+					make_shared<TldFeature>()));
+			m_mapRecvFeatures[objIdFromOthers]->cameraId = cameraId;
+		}
+		m_mapRecvFeatures[objIdFromOthers]->vFalsePositives->push_back(move(spFalsePositive));
 	}
 
 	return true;
@@ -256,12 +240,7 @@ bool CTrackAlgTLD::identifyObject(string& objId, IplImage *img, CvRect detectedB
 			printf("[TrackAlgTLD][identifyObject] Confident: %f, id: %s\n", f, objIdFromOthers.c_str());
 
 			if (f >= m_MergeThreshold) {
-				if (m_mapRecvFeatures[objIdFromOthers]) {
-					delete m_mapRecvFeatures[objIdFromOthers];
-					m_mapRecvFeatures[objIdFromOthers] = NULL;
-				}
 				m_mapRecvFeatures.erase(objIdFromOthers);
-
 				m_mapTrack[objId]->setChecked(true);
 				return true;
 			}
@@ -288,7 +267,7 @@ bool CTrackAlgTLD::isAnyObjToIdendify() const {
 }
 
 void CTrackAlgTLD::getObjIdList(vector<string>& vObjId) const {
-	map<string, Main*>::iterator it;
+	map<string, shared_ptr<Main> >::iterator it;
 	for (it = m_mapTrack.begin(); it != m_mapTrack.end(); it++)
 		vObjId.push_back(it->first);
 }
