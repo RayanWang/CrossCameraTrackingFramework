@@ -26,33 +26,54 @@ using namespace boost::uuids;
 namespace ccFramework {
 namespace transfer {
 
+static interprocess_semaphore semTransfer(1);
+
 typedef void (*recvFeature)(int32_t, uuid, void*, uint32_t, void*, uint32_t, void*);
 
 /*
  * To provide the transfer mode for AnalyzerTK, for one single current camera
  */
 class FeatureTransfer {
-public:
-	FeatureTransfer(const int32_t cameraId) :
+	FeatureTransfer() :
 			m_TotCameraNum(0),
 			m_MaxNumOfTarget(0),
 			m_descSizeInByte(0),
 			m_featureSizeInByte(0),
 			m_checkListSize(0),
-			m_cameraId(cameraId),
+			m_cameraId(1<<31),
 			m_transferErrorCode(unknown),
 			m_boostErrorCode(no_error),
 			m_recvThread(0),
 			m_pShmCamera(NULL),
 			m_cbRecv(NULL),
 			m_userData(NULL) {
-		shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
 	}
+
 	~FeatureTransfer() {
 		shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
 	}
 
-	bool initTransfer();
+public:
+	static FeatureTransfer* getInstance() {
+		static FeatureTransfer* transferInstance = NULL;
+		if (!transferInstance) {
+			semTransfer.wait();
+			if (!transferInstance)
+				transferInstance = new FeatureTransfer();
+			semTransfer.post();
+		}
+
+		return transferInstance;
+	}
+	static void releaseInstance() {
+		if (getInstance()) {
+			semTransfer.wait();
+			if (getInstance())
+				delete getInstance();
+			semTransfer.post();
+		}
+	}
+	bool initTransfer(const int32_t cameraId);
 	bool sendFeatureToAll(int32_t fromCamId, uuid& objId, void* feature,
 			uint32_t featureSizeInByte, void* pDesc = NULL, uint32_t descSizeInByte = 0);
 	void startRecvFeatures() { pthread_create(&m_recvThread, NULL, recvFeatures, this); }
@@ -95,14 +116,14 @@ private:
 		bool* checkList;
 	};
 
-	struct circularQueueueue {
-		circularQueueueue() :
+	struct circularQueue {
+		circularQueue() :
 				flag(0),
 				capacity(0),
 				front(-1),
 				rear(-1) {
 		}
-		~circularQueueueue() {
+		~circularQueue() {
 		}
 
 		void init(int32_t queueSize, char* queueStartAddr) {
@@ -163,7 +184,7 @@ private:
 	struct shm_Camera {
 		shm_Camera(int32_t capacity, char* queueStartAddr) :
 				sem_camera(1) {
-			circularQueue.init(capacity, queueStartAddr);
+			dataQueue.init(capacity, queueStartAddr);
 		}
 		~shm_Camera() {
 		}
@@ -171,7 +192,7 @@ private:
 		//Semaphores to protect and synchronize access
 		interprocess_semaphore sem_camera;
 
-		circularQueueueue circularQueue;
+		circularQueue dataQueue;
 	};
 #pragma pack(pop)
 
@@ -196,7 +217,9 @@ private:
 	}
 };
 
-inline bool FeatureTransfer::initTransfer() {
+inline bool FeatureTransfer::initTransfer(const int32_t cameraId) {
+	m_cameraId = cameraId;
+	shared_memory_object::remove((const char*) ConvertToString(m_cameraId).c_str());
 	try {
 		shared_memory_object shmCrossCamera(open_only, CrossCameraCenter, read_write);
 		mapped_region regionCrossCamera(shmCrossCamera, read_write);
@@ -281,7 +304,7 @@ inline bool FeatureTransfer::sendFeatureToAll(int32_t fromCamId, uuid& objId,
 			memset(&header, 0, sizeof(header));
 			header.fromCameraId = fromCamId;
 			memcpy(&header.objId, &objId, sizeof(uuid));
-			if (!feature->circularQueue.enqueue(header)) {
+			if (!feature->dataQueue.enqueue(header)) {
 				cout << "Failed to send data to camera " << i << endl;
 				m_transferErrorCode = buffer_full_error;
 				feature->sem_camera.post();
@@ -308,7 +331,7 @@ inline void* FeatureTransfer::recvFeatures(void* lpParam) {
 			transfer->m_pShmCamera->sem_camera.wait();
 			FeatureHeader header;
 			memset(&header, 0, sizeof(header));
-			bool bRet = transfer->m_pShmCamera->circularQueue.dequeue(&header);
+			bool bRet = transfer->m_pShmCamera->dataQueue.dequeue(&header);
 			transfer->m_pShmCamera->sem_camera.post();
 
 			if (bRet) {

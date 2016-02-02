@@ -1,4 +1,4 @@
-src/main/Main.o: ../src/main/Main.cpp ../src/main/Main.h \
+src/main/Main.d: ../src/main/Main.cpp ../src/main/Main.h \
  ../src/main/../tld/TLD.h ../src/main/../tld/MedianFlowTracker.h \
  ../src/main/../tld/DetectorCascade.h \
  ../src/main/../tld/DetectionResult.h \

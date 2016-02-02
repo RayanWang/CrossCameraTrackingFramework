@@ -1,4 +1,4 @@
-src/main/Config.o: ../src/main/Config.cpp ../src/main/Config.h \
+src/main/Config.d: ../src/main/Config.cpp ../src/main/Config.h \
  ../src/main/Main.h ../src/main/../tld/TLD.h \
  ../src/main/../tld/MedianFlowTracker.h \
  ../src/main/../tld/DetectorCascade.h \

@@ -1,4 +1,4 @@
-src/TrackAlgTLD.o: ../src/TrackAlgTLD.cpp ../src/TrackAlgTLD.h \
+src/TrackAlgTLD.d: ../src/TrackAlgTLD.cpp ../src/TrackAlgTLD.h \
  /home/rayan/workspace/include/TrackAlg.h \
  /home/rayan/workspace/include/ClassFactory.h ../src/main/Main.h \
  ../src/main/../tld/TLD.h ../src/main/../tld/MedianFlowTracker.h \

@@ -1,4 +1,4 @@
-src/tld/NNClassifier.o: ../src/tld/NNClassifier.cpp \
+src/tld/NNClassifier.d: ../src/tld/NNClassifier.cpp \
  ../src/tld/NNClassifier.h ../src/tld/NormalizedPatch.h \
  ../src/tld/DetectionResult.h ../src/tld/../TldFeature.h \
  ../src/tld/DetectorCascade.h ../src/tld/ForegroundDetector.h \

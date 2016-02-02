@@ -1,4 +1,4 @@
-src/tld/DetectorCascade.o: ../src/tld/DetectorCascade.cpp \
+src/tld/DetectorCascade.d: ../src/tld/DetectorCascade.cpp \
  ../src/tld/DetectorCascade.h ../src/tld/DetectionResult.h \
  ../src/tld/ForegroundDetector.h ../src/tld/VarianceFilter.h \
  ../src/tld/IntegralImage.h ../src/tld/EnsembleClassifier.h \

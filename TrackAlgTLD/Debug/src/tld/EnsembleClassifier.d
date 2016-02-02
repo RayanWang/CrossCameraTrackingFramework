@@ -1,4 +1,4 @@
-src/tld/EnsembleClassifier.o: ../src/tld/EnsembleClassifier.cpp \
+src/tld/EnsembleClassifier.d: ../src/tld/EnsembleClassifier.cpp \
  ../src/tld/DetectorCascade.h ../src/tld/DetectionResult.h \
  ../src/tld/ForegroundDetector.h ../src/tld/VarianceFilter.h \
  ../src/tld/IntegralImage.h ../src/tld/EnsembleClassifier.h \

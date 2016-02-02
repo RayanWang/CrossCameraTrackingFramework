@@ -1,4 +1,4 @@
-src/tld/TLD.o: ../src/tld/TLD.cpp ../src/tld/TLD.h \
+src/tld/TLD.d: ../src/tld/TLD.cpp ../src/tld/TLD.h \
  ../src/tld/MedianFlowTracker.h ../src/tld/DetectorCascade.h \
  ../src/tld/DetectionResult.h ../src/tld/ForegroundDetector.h \
  ../src/tld/VarianceFilter.h ../src/tld/IntegralImage.h \

@@ -110,9 +110,9 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	FeatureTransfer transfer(g_CameraId);
-	if (!transfer.initTransfer()) {
-		error_code_transfer error = transfer.getTransferError();
+	FeatureTransfer* transfer = FeatureTransfer::getInstance();
+	if (!transfer->initTransfer(g_CameraId)) {
+		error_code_transfer error = transfer->getTransferError();
 		cout << "--(!) Transfer init error" << error << endl;
 		return 0;
 	}
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 			CV_HAAR_SCALE_IMAGE, 3, 20, 30, 1.1);
 	CTrackAlg* pTKAlg = pTrackGen->CreateTrackingObject();
 
-	transfer.setRecvCallback(recvData, pTKAlg);
+	transfer->setRecvCallback(recvData, pTKAlg);
 
 	int32_t nCurrState = detection_state;
 	int32_t nHeads = 0;
@@ -150,13 +150,13 @@ int main(int argc, char **argv) {
 					if (false == pTKAlg->prepareTracking(tldParam.vInitObjIdList[i], &img, &vRegions[i]))
 						goto exit;
 					else
-						pTKAlg->setObjLeaveCallback(tldParam.vInitObjIdList[i], sendData, &transfer);
+						pTKAlg->setObjLeaveCallback(tldParam.vInitObjIdList[i], sendData, transfer);
 				}
 
 				nCurrState = tracking_state;
 				pTKAlg->getObjIdList(vObjIdList);
 
-				transfer.startRecvFeatures();
+				transfer->startRecvFeatures();
 			}
 		}
 		if (tracking_state == nCurrState) {
@@ -214,7 +214,7 @@ int main(int argc, char **argv) {
 						if (!pTKAlg->prepareTracking(strObjId, &img, &vRegions[i]))
 							goto exit;
 						else
-							pTKAlg->setObjLeaveCallback(strObjId, sendData, &transfer);
+							pTKAlg->setObjLeaveCallback(strObjId, sendData, transfer);
 				}
 			}
 		}
@@ -226,6 +226,7 @@ int main(int argc, char **argv) {
 	}
 
 exit:
+	FeatureTransfer::releaseInstance();
 	pTKAlg->release();
 	delete pTKAlg;
 

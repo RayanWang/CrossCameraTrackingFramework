@@ -1,4 +1,4 @@
-src/tld/TLDUtil.o: ../src/tld/TLDUtil.cpp ../src/tld/TLDUtil.h \
+src/tld/TLDUtil.d: ../src/tld/TLDUtil.cpp ../src/tld/TLDUtil.h \
  ../src/tld/NormalizedPatch.h ../src/tld/DetectorCascade.h \
  ../src/tld/DetectionResult.h ../src/tld/ForegroundDetector.h \
  ../src/tld/VarianceFilter.h ../src/tld/IntegralImage.h \
