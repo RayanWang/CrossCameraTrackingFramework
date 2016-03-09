@@ -16,7 +16,7 @@ This README would normally document whatever steps are necessary to get your app
 * ex: TrackingManager -t 2 -m 4, which "-t" means how many cameras will be used and "-m" the max number of targets in each single camera.
 * After running Tracking Manager, you can execute the AnalyzerTK for doing the tracking, and the parameters are defined below:
 * * "-c" to give the camera ID in integer.
-* * "-k" to set up an interval in ms to keep tracking an object which has disappeared at that moment.
+* * "-k" to set up an interval in ms to keep tracking an object which has disappeared from that moment.
 * * "-l" is the detection model file path trained by Adaboost(openCV).
 * * "-r" describe which tracking algorithm will be loaded (in this system will be "TLD").
 * * "-v" set up the IP camera URL.
