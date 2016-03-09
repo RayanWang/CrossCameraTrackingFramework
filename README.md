@@ -14,13 +14,11 @@ Finally, the Analyzer will invoke the tracking API for doing the object tracking
 
 ### How do I get set up? ###
 
-To run this system, make sure that you have already installed FFMpeg, openCV (2.4.9 or later) and boost IPC (1.59.0 or later).
-
-First, you should run the Tracking Manager for create the resource for the system.
+* To run this system, make sure that you have already installed FFMpeg, openCV (2.4.9 or later) and boost IPC (1.59.0 or later).
+* First, you should run the Tracking Manager for create the resource for the system.
 ex: TrackingManager -t 2 -m 4
 which "-t" means how many cameras will be used and "-m" the max number of targets in each single camera.
-
-After running Tracking Manager, you can execute the AnalyzerTK for doing the tracking, and the parameters are defined below:
+* After running Tracking Manager, you can execute the AnalyzerTK for doing the tracking, and the parameters are defined below:
 "-c" to give the camera ID in integer.
 "-k" to set up an interval in ms to keep tracking an object which has disappeared at that moment.
 "-l" is the detection model file path trained by Adaboost(openCV).
