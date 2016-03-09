@@ -21,4 +21,4 @@ which "-t" means how many cameras will be used and "-m" the max number of target
 * * "-l" is the detection model file path trained by Adaboost(openCV).
 * * "-r" describe which tracking algorithm will be loaded (in this system will be "TLD").
 * * "-v" set up the IP camera URL.
-* If you want to set multiple cameras at the same time, please execute the Analyzer more times and input different camera IDs and URLs respectively.
+* If you want to build a cross camera system, please execute the Analyzer once for each  and input different camera IDs and URLs as parameters described above respectively.
