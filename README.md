@@ -5,7 +5,7 @@ This README would normally document whatever steps are necessary to get your app
 ### What is this repository for? ###
 
 * This is a cross camera object tracking system for visual surveillance, including the Tracking Manager, Tracking Algorithm module and an Analyzer for showing the result.
-* The Tracking Manager responsible for maintaining all resources that will dispatched to all cameras(e.g. IP camera) in the system, including the object feature data transferring and the data format definition etc. On the other hand, the entry/exit zone mapping function(algorithm) between those cameras will be implemented in this module soon.
+* The Tracking Manager responsible for maintaining all resources that will be dispatched to all cameras(e.g. IP camera) in the system, including the object feature data transferring and the data format definition etc. On the other hand, the entry/exit zone mapping function(algorithm) between those cameras will be implemented in this module soon.
 * The Tracking Algorithm implemented with an open source framework TLD(tracking-learning-detection) at present, and is build as a library for easy to replace. Now, this algorithm seems not good for object re-identification in multi-object tracking since its feature is not robust(only color histogram). I will try to add some new features or use other algorithm such as ELM for making this better.
 * Finally, the Analyzer will invoke the tracking API for doing the object tracking for one camera and showing the result by use of openCV.
 
