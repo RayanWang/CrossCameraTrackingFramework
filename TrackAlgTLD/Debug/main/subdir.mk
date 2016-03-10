@@ -4,20 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/TrackingManager.cpp 
+../main/Config.cpp \
+../main/Main.cpp \
+../main/Trajectory.cpp 
 
 OBJS += \
-./src/TrackingManager.o 
+./main/Config.o \
+./main/Main.o \
+./main/Trajectory.o 
 
 CPP_DEPS += \
-./src/TrackingManager.d 
+./main/Config.d \
+./main/Main.d \
+./main/Trajectory.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/%.o: ../src/%.cpp
+main/%.o: ../main/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I/home/rayan/workspace/include -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++ -I/home/rayan/workspace/include -O0 -g3 -Wall -c -fmessage-length=0 -fopenmp -std=c++11 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

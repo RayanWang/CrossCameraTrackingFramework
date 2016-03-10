@@ -12,8 +12,8 @@ ASM_SRCS :=
 CXX_SRCS := 
 C++_SRCS := 
 CC_SRCS := 
-C++_DEPS := 
 OBJS := 
+C++_DEPS := 
 C_DEPS := 
 CC_DEPS := 
 LIBRARIES := 
@@ -23,9 +23,9 @@ C_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-src/tld \
-src/mftracker \
-src/main \
-src/cvblobs \
-src \
+tld \
+mftracker \
+main \
+cvblobs \
+. \
 

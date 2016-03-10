@@ -8,11 +8,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/tld/subdir.mk
--include src/mftracker/subdir.mk
--include src/main/subdir.mk
--include src/cvblobs/subdir.mk
--include src/subdir.mk
+-include tld/subdir.mk
+-include mftracker/subdir.mk
+-include main/subdir.mk
+-include cvblobs/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -47,14 +46,14 @@ all: libTrackAlgTLD.so
 # Tool invocations
 libTrackAlgTLD.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: Cross G++ Linker'
+	@echo 'Invoking: GCC C++ Linker'
 	g++ -L/usr/local/lib -shared -o "libTrackAlgTLD.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libTrackAlgTLD.so
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libTrackAlgTLD.so
 	-@echo ' '
 
 .PHONY: all clean dependents
