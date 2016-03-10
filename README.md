@@ -18,9 +18,9 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Parameter settings ###
 
-* "-c" to give the camera ID in integer.
-* "-k" to set up an interval in ms to keep tracking an object which has disappeared from that moment.
-* "-l" is the detection model file path trained by Adaboost(openCV).
-* "-r" describe which tracking algorithm will be loaded (in this system will be "TLD").
-* "-v" set up the IP camera URL.
+* "-c" : give the camera ID in integer.
+* "-k" : set up an interval in ms to keep tracking an object which has disappeared from that moment.
+* "-l" : the detection model file path trained by Adaboost(openCV).
+* "-r" : describe which tracking algorithm will be loaded (in this system will be "TLD").
+* "-v" : set up the IP camera URL.
 * If you want to build a cross camera system, please execute the Analyzer once for each camera and input different camera IDs and URLs as parameters described above respectively.
