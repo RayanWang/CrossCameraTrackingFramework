@@ -20,7 +20,7 @@ This README would normally document whatever steps are necessary to get your app
 ### Parameter settings for AnalyzerTK###
 
 * "-c" : give the camera ID in integer.
-* "-k" : set up an interval in ms to keep tracking an object which has disappeared from that moment.
-* "-l" : the detection model file path trained by Adaboost(openCV).
+* "-k" : set up an interval in ms to keep tracking an object which disappeared from that moment.
+* "-l" : the detection model file path trained by adaboost(openCV).
 * "-r" : describe which tracking algorithm will be loaded (in this system will be "TLD").
 * "-v" : set up the IP camera URL.
