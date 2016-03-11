@@ -17,7 +17,7 @@ This README would normally document whatever steps are necessary to get your app
 * Ex: TrackingManager -t 2 -m 4, which "-t" means how many cameras will be used and "-m" the max number of targets each camera can support.
 * After running TrackingManager, you can execute AnalyzerTK for tracking.
 
-### Parameter settings ###
+### Parameter settings for AnalyzerTK###
 
 * "-c" : give the camera ID in integer.
 * "-k" : set up an interval in ms to keep tracking an object which has disappeared from that moment.
