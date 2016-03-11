@@ -12,7 +12,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### How do I get set up? ###
 
-* To run this system, make sure that you have already installed FFMpeg and openCV (2.4.9 or later).
+* To run this system, make sure that you have already installed openCV (building with gstreamer and without ffmpeg, since ffmpeg has a socket buffer only 64KB and may cause the packet loss; version with 2.4.9 or later).
 * First, you should run TrackingManager for creating the resource for the system.
 * Ex: TrackingManager -t 2 -m 4, which "-t" means how many cameras will be used and "-m" the max number of targets each camera can support.
 * After running TrackingManager, you can execute AnalyzerTK for tracking.
