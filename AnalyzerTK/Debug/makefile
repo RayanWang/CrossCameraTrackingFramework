@@ -44,7 +44,7 @@ all: AnalyzerTK
 AnalyzerTK: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L"/home/rayan/workspace/TrackAlgTLD/Debug" -L/usr/local/lib -o "AnalyzerTK" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"/home/rayan/workspace/TrackAlgTLD/Debug" -o "AnalyzerTK" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -47,7 +47,7 @@ all: libTrackAlgTLD.so
 libTrackAlgTLD.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/usr/local/lib -shared -o "libTrackAlgTLD.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -shared -o "libTrackAlgTLD.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

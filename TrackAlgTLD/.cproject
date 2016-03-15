@@ -58,9 +58,7 @@
 									<listOptionValue builtIn="false" value="opencv_imgproc"/>
 									<listOptionValue builtIn="false" value="opencv_highgui"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.1232079886" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/usr/local/lib"/>
-								</option>
+								<option id="gnu.cpp.link.option.paths.1232079886" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.226046448" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

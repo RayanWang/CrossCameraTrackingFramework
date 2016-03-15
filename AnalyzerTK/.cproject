@@ -26,7 +26,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1321495657" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/home/rayan/workspace/include"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1652025760" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.1652025760" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.402202707" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1061850234" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -51,7 +51,6 @@
 								</option>
 								<option id="gnu.cpp.link.option.paths.305009553" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrackAlgTLD/Debug}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1186280452" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
