@@ -39,11 +39,11 @@ void recvData(int32_t fromCameraId, uuid objId, void* feature,
 	CTrackAlg* pTKAlg = (CTrackAlg*)userData;
 
 	string strObjId = boost::lexical_cast<string>(objId);
-	TldFeatureDescription* tldFeature = new TldFeatureDescription;
-	memcpy(tldFeature, desc, sizeof(TldFeatureDescription));
+	//TldFeatureDescription* tldFeature = new TldFeatureDescription;
+	//memcpy(tldFeature, desc, sizeof(TldFeatureDescription));
 
-	pTKAlg->setObjectFeatures(fromCameraId, strObjId, feature, tldFeature);
-	delete tldFeature;
+	pTKAlg->setObjectFeatures(fromCameraId, strObjId, feature, desc/*tldFeature*/);
+	//delete tldFeature;
 }
 
 void sendData(void* userData, string& objId, void* feature, uint32_t featureSizeInByte,
