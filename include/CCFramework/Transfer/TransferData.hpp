@@ -29,6 +29,7 @@ enum error_code_transfer {
 	no_enough_capacity,
 	invalid_arg,
 	get_shm_size_error,
+	callback_error,
 
 	boost_shm_error,			// boost shared memory error, please further confirm the boost error code
 

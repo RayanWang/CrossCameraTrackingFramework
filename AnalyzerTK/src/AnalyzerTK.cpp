@@ -34,20 +34,19 @@ using namespace boost::uuids;
 
 int32_t g_CameraId = -1;
 
-void recvData(int32_t fromCameraId, uuid objId, void* feature,
-		uint32_t sizeofFeature, void* desc, uint32_t sizeofDesc, void* userData) {
+void recvData(int32_t fromCameraId, uuid objId, char* feature,
+		uint32_t sizeofFeature, char* desc, uint32_t sizeofDesc, void* userData) {
 	CTrackAlg* pTKAlg = (CTrackAlg*)userData;
 
 	string strObjId = boost::lexical_cast<string>(objId);
-	//TldFeatureDescription* tldFeature = new TldFeatureDescription;
-	//memcpy(tldFeature, desc, sizeof(TldFeatureDescription));
 
-	pTKAlg->setObjectFeatures(fromCameraId, strObjId, feature, desc/*tldFeature*/);
-	//delete tldFeature;
+	pTKAlg->setObjectFeatures(fromCameraId, strObjId, sizeofFeature, feature, sizeofDesc, desc);
+
+	printf("[AnalyzerTK][recvData] setObjectFeatures\n");
 }
 
-void sendData(void* userData, string& objId, void* feature, uint32_t featureSizeInByte,
-		void* pDesc, uint32_t descSizeInByte) {
+void sendData(void* userData, string& objId, char* feature, uint32_t featureSizeInByte,
+		char* pDesc, uint32_t descSizeInByte) {
 	if (!userData)
 		return;
 
@@ -55,6 +54,8 @@ void sendData(void* userData, string& objId, void* feature, uint32_t featureSize
 	uuid obj_uuid = boost::lexical_cast<uuid>(objId);
 	transfer->sendFeatureToAll(g_CameraId, obj_uuid, feature,
 			featureSizeInByte, pDesc, descSizeInByte);
+
+	printf("[AnalyzerTK][sendData] sendFeatureToAll\n");
 }
 
 void* startTrackingThread(void* lpParam) {
@@ -110,24 +111,24 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	FeatureTransfer* transfer = FeatureTransfer::getInstance();
-	if (!transfer->initTransfer(g_CameraId)) {
-		error_code_transfer error = transfer->getTransferError();
+	FeatureTransfer transfer(g_CameraId);
+	if (!transfer.initTransfer()) {
+		error_code_transfer error = transfer.getTransferError();
 		cout << "--(!) Transfer init error" << error << endl;
 		return 0;
 	}
 
-	std::shared_ptr<adaboostDetect> detect = make_shared<adaboostDetect>(strDetectionModelPath,
-			CV_HAAR_SCALE_IMAGE, 3, 20, 30, 1.1);
+	std::shared_ptr<adaboostDetect> detect = make_shared<adaboostDetect>(strDetectionModelPath, CV_HAAR_SCALE_IMAGE, 3, 30, 40, 1.1);
 	CTrackAlg* pTKAlg = pTrackGen->CreateTrackingObject();
 
-	transfer->setRecvCallback(recvData, pTKAlg);
+	transfer.setRecvCallback(recvData, pTKAlg);
+	transfer.startRecvFeatures();
 
 	int32_t nCurrState = detection_state;
 	int32_t nHeads = 0;
 	vector<CvRect> vRegions;
 	vector<string> vObjIdList;
-	vector<trackingData*> vTrackObj;
+	vector<std::shared_ptr<trackingData> > vTrackObj;
 	Mat frame;
 	while (capture.read(frame)) {
 		double t1 = 0;
@@ -150,13 +151,11 @@ int main(int argc, char **argv) {
 					if (false == pTKAlg->prepareTracking(tldParam.vInitObjIdList[i], &img, &vRegions[i]))
 						goto exit;
 					else
-						pTKAlg->setObjLeaveCallback(tldParam.vInitObjIdList[i], sendData, transfer);
+						pTKAlg->setObjLeaveCallback(tldParam.vInitObjIdList[i], sendData, &transfer);
 				}
 
 				nCurrState = tracking_state;
 				pTKAlg->getObjIdList(vObjIdList);
-
-				transfer->startRecvFeatures();
 			}
 		}
 		if (tracking_state == nCurrState) {
@@ -166,12 +165,12 @@ int main(int argc, char **argv) {
 				bool bKeepTrack = false;
 				if (pTKAlg->willKeepTracking(vObjIdList[i], &bKeepTrack)) {
 					if (bKeepTrack) {
-						trackingData *pTracking = new trackingData();
+						std::shared_ptr<trackingData> pTracking = make_shared<trackingData>();
 						pTracking->objId = vObjIdList[i];
 						pTracking->img = &img;
 						pTracking->pAlg = pTKAlg;
 						pthread_create(&pTracking->trackingThread, NULL,
-								startTrackingThread, pTracking);
+								startTrackingThread, pTracking.get());
 						vTrackObj.push_back(pTracking);
 					} else {
 						vObjIdList.clear();
@@ -181,10 +180,8 @@ int main(int argc, char **argv) {
 			}
 
 			// wait until the tracking of all targets have been finished
-			for (uint32_t i = 0; i < vTrackObj.size(); ++i) {
+			for (uint32_t i = 0; i < vTrackObj.size(); ++i)
 				pthread_join(vTrackObj[i]->trackingThread, NULL);
-				delete vTrackObj[i];
-			}
 			vTrackObj.clear();
 			//---------------------------- end tracking -----------------------------
 
@@ -214,7 +211,7 @@ int main(int argc, char **argv) {
 						if (!pTKAlg->prepareTracking(strObjId, &img, &vRegions[i]))
 							goto exit;
 						else
-							pTKAlg->setObjLeaveCallback(strObjId, sendData, transfer);
+							pTKAlg->setObjLeaveCallback(strObjId, sendData, &transfer);
 				}
 			}
 		}
@@ -226,7 +223,6 @@ int main(int argc, char **argv) {
 	}
 
 exit:
-	FeatureTransfer::releaseInstance();
 	pTKAlg->release();
 	delete pTKAlg;
 

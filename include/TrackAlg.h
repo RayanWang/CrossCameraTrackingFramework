@@ -29,7 +29,7 @@ public:
 	}
 };
 
-typedef void (*cbTrackCallback)(void*, std::string&, void*, uint32_t, void*, uint32_t);
+typedef void (*cbTrackCallback)(void*, std::string&, char*, uint32_t, char*, uint32_t);
 
 class CTrackAlg {
 public:
@@ -54,8 +54,8 @@ public:
 
 	virtual bool willKeepTracking(std::string& objId, bool* pbKeepTrack) = 0;
 
-	virtual bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, void* feature,
-			void* pFeatureDesc = NULL) = 0;
+	virtual bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, char* feature,
+			uint32_t sizeofDesc = 0, char* pFeatureDesc = NULL) = 0;
 
 	virtual bool identifyObject(std::string& objId, IplImage *img, CvRect detectedBox,
 			int32_t& cameraId, std::string& objIdFromOthers) = 0;

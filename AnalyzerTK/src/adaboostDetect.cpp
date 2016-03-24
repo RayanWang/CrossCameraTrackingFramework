@@ -85,7 +85,7 @@ int adaboostDetect::detectObject(IplImage* img, vector<CvRect> & regions) {
 	cvReleaseImage(&smallImg);
 
 	t = (double) cvGetTickCount() - t;
-	printf("detection time = %g ms\n", t / ((double)cvGetTickFrequency()*1000.));
+	//printf("detection time = %g ms\n", t / ((double)cvGetTickFrequency()*1000.));
 
 	return regions.size();
 }
