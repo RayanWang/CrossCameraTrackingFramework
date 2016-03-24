@@ -186,8 +186,8 @@ bool CTrackAlgTLD::willKeepTracking(string& objId, bool* pbKeepTrack) {
 }
 
 // set the object feature to TLD
-bool CTrackAlgTLD::setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, char* feature,
-		uint32_t sizeofDesc, char* pFeatureDesc) {
+bool CTrackAlgTLD::setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, BYTE* feature,
+		uint32_t sizeofDesc, BYTE* pFeatureDesc) {
 	if (!feature || !pFeatureDesc) {
 		m_errCode = invalid_arg;
 		return false;

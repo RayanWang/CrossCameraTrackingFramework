@@ -8,6 +8,7 @@
 #ifndef TRACKALG_H_
 #define TRACKALG_H_
 
+#include <climits>
 #include <opencv2/core/types_c.h>
 
 #include "ClassFactory.h"
@@ -29,11 +30,12 @@ public:
 	}
 };
 
-typedef void (*cbTrackCallback)(void*, std::string&, char*, uint32_t, char*, uint32_t);
+typedef unsigned char BYTE;
+typedef void (*cbTrackCallback)(void*, std::string&, BYTE*, uint32_t, BYTE*, uint32_t);
 
 class CTrackAlg {
 public:
-	CTrackAlg() : m_TrivialObjId(1 >> 63), m_errCode(1 >> 31), m_cbTrack(NULL), m_userData(NULL) {}
+	CTrackAlg() : m_TrivialObjId(LLONG_MIN), m_errCode(INT_MIN), m_cbTrack(NULL), m_userData(NULL) {}
 	virtual ~CTrackAlg() {}
 
 	static void* CreateInstance() { return NULL; }
@@ -54,8 +56,8 @@ public:
 
 	virtual bool willKeepTracking(std::string& objId, bool* pbKeepTrack) = 0;
 
-	virtual bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, char* feature,
-			uint32_t sizeofDesc = 0, char* pFeatureDesc = NULL) = 0;
+	virtual bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, BYTE* feature,
+			uint32_t sizeofDesc = 0, BYTE* pFeatureDesc = NULL) = 0;
 
 	virtual bool identifyObject(std::string& objId, IplImage *img, CvRect detectedBox,
 			int32_t& cameraId, std::string& objIdFromOthers) = 0;

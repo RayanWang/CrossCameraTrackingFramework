@@ -68,8 +68,8 @@ public:
 		desc.eachElementSize = eachElementSize;
 
 		if (trackAlg->m_cbTrack)
-			trackAlg->m_cbTrack(trackAlg->m_userData, objId, (char*)feature, featureSizeInByte,
-					(char*)&desc, sizeof(TldFeatureDescription));
+			trackAlg->m_cbTrack(trackAlg->m_userData, objId, (BYTE*)feature, featureSizeInByte,
+					(BYTE*)&desc, sizeof(TldFeatureDescription));
 	}
 
 	// implement abstract class CTrackAlg
@@ -90,8 +90,8 @@ public:
 
 	bool willKeepTracking(std::string& objId, bool* pbKeepTrack);
 
-	bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, char* feature,
-			uint32_t sizeofDesc = 0, char* pFeatureDesc = NULL);
+	bool setObjectFeatures(int32_t cameraId, std::string& objIdFromOthers, uint32_t sizeofFeature, BYTE* feature,
+			uint32_t sizeofDesc = 0, BYTE* pFeatureDesc = NULL);
 
 	bool identifyObject(std::string& objId, IplImage *img, CvRect detectedBox, int32_t& cameraId,
 			std::string& objIdFromOthers);

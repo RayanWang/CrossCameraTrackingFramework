@@ -27,7 +27,8 @@ using namespace boost::uuids;
 namespace ccFramework {
 namespace transfer {
 
-typedef void (*recvFeature)(int32_t, uuid, char*, uint32_t, char*, uint32_t, void*);
+typedef unsigned char BYTE;
+typedef void (*recvFeature)(int32_t, uuid, BYTE*, uint32_t, BYTE*, uint32_t, void*);
 
 /*
  * To provide the transfer mode for AnalyzerTK, for one single current camera
@@ -58,8 +59,8 @@ public:
 	}
 
 	bool initTransfer();
-	bool sendFeatureToAll(int32_t fromCamId, uuid& objId, char* feature,
-			uint32_t featureSizeInByte, char* pDesc = NULL, uint32_t descSizeInByte = 0);
+	bool sendFeatureToAll(int32_t fromCamId, uuid& objId, BYTE* feature,
+			uint32_t featureSizeInByte, BYTE* pDesc = NULL, uint32_t descSizeInByte = 0);
 	void startRecvFeatures() { pthread_create(&m_recvThread, NULL, recvFeatures, this); }
 	void setRecvCallback(recvFeature callback, void* userData) {
 		m_cbRecv = callback;
@@ -103,8 +104,8 @@ private:
 		uint32_t descSizeInByte;
 		uint32_t featureSizeInByte;
 
-		char desc[MaxDescSize];
-		char feature[MaxFeatureSize];
+		BYTE desc[MaxDescSize];
+		BYTE feature[MaxFeatureSize];
 		bool checkList[MaxCameraNum - 1];
 	};
 
@@ -239,7 +240,7 @@ inline bool FeatureTransfer::initTransfer() {
 }
 
 inline bool FeatureTransfer::sendFeatureToAll(int32_t fromCamId, uuid& objId,
-		 char* feature, uint32_t featureSizeInByte, char* pDesc, uint32_t descSizeInByte) {
+		BYTE* feature, uint32_t featureSizeInByte, BYTE* pDesc, uint32_t descSizeInByte) {
 	if (!feature) {
 		m_transferErrorCode = invalid_arg;
 		return false;
@@ -330,8 +331,8 @@ inline void* FeatureTransfer::recvFeatures(void* lpParam) {
 					mapped_region regionFeature(shmFeature, read_write);
 
 					FeatureData* data = static_cast<FeatureData*>(regionFeature.get_address());
-					char* recvDesc = new char[data->descSizeInByte];
-					char* recvFeature = new char[data->featureSizeInByte];
+					BYTE* recvDesc = new BYTE[data->descSizeInByte];
+					BYTE* recvFeature = new BYTE[data->featureSizeInByte];
 					memcpy(recvDesc, data->desc, data->descSizeInByte);
 					memcpy(recvFeature, data->feature, data->featureSizeInByte);
 

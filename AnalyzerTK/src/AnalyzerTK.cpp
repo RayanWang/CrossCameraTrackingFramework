@@ -34,8 +34,8 @@ using namespace boost::uuids;
 
 int32_t g_CameraId = -1;
 
-void recvData(int32_t fromCameraId, uuid objId, char* feature,
-		uint32_t sizeofFeature, char* desc, uint32_t sizeofDesc, void* userData) {
+void recvData(int32_t fromCameraId, uuid objId, BYTE* feature,
+		uint32_t sizeofFeature, BYTE* desc, uint32_t sizeofDesc, void* userData) {
 	CTrackAlg* pTKAlg = (CTrackAlg*)userData;
 
 	string strObjId = boost::lexical_cast<string>(objId);
@@ -45,8 +45,8 @@ void recvData(int32_t fromCameraId, uuid objId, char* feature,
 	printf("[AnalyzerTK][recvData] setObjectFeatures\n");
 }
 
-void sendData(void* userData, string& objId, char* feature, uint32_t featureSizeInByte,
-		char* pDesc, uint32_t descSizeInByte) {
+void sendData(void* userData, string& objId, BYTE* feature, uint32_t featureSizeInByte,
+		BYTE* pDesc, uint32_t descSizeInByte) {
 	if (!userData)
 		return;
 
