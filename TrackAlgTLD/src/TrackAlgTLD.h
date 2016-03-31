@@ -78,7 +78,7 @@ public:
 
 	void release(void);
 
-	bool prepareTracking(std::string& objId, IplImage* img, CvRect* pTargetBox = NULL);
+	bool prepareTracking(std::string& objId, IplImage* img, std::string stWinName, CvRect* pTargetBox = NULL);
 
 	bool startTracking(std::string& objId, IplImage* img);
 

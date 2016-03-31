@@ -35,7 +35,7 @@ public:
 	Main();
 	~Main();
 
-	void prepareWork(IplImage *img, CvRect *pTargetBox = NULL);
+	void prepareWork(IplImage *img, std::string stWinName, CvRect *pTargetBox = NULL);
 
 	bool doWork(IplImage *img);
 

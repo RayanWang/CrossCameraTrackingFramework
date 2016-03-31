@@ -44,7 +44,7 @@ public:
 
 	virtual void release(void) = 0;
 
-	virtual bool prepareTracking(std::string& objId, IplImage* img, CvRect* pTargetBox = NULL) = 0;
+	virtual bool prepareTracking(std::string& objId, IplImage* img, std::string stWinName, CvRect* pTargetBox = NULL) = 0;
 
 	virtual bool startTracking(std::string& objId, IplImage* img) = 0;
 

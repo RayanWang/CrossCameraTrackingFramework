@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 				}
 				pTKAlg->init(&tldParam);
 				for (int32_t i = 0; i < nHeads; ++i) {
-					if (false == pTKAlg->prepareTracking(tldParam.vInitObjIdList[i], &img, &vRegions[i]))
+					if (false == pTKAlg->prepareTracking(tldParam.vInitObjIdList[i], &img, ANALYZER_TRACK_WINDOW, &vRegions[i]))
 						goto exit;
 					else
 						pTKAlg->setObjLeaveCallback(tldParam.vInitObjIdList[i], sendData, &transfer);
@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
 			for (int32_t i = 0; i < nHeads; ++i) {
 				bool bObjFromOtherCam = false;
 				if (pTKAlg->isAnyObjToIdendify()) {
-					int32_t cameraId = 1 >> 31;
+					int32_t cameraId = 1 << 31;
 					string objId;
 					for (uint32_t j = 0; j < vObjIdList.size(); ++j) {
 						if (pTKAlg->identifyObject(vObjIdList[j], &img, vRegions[i], cameraId, objId)) {
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
 						vObjIdList.clear();
 						pTKAlg->getObjIdList(vObjIdList);
 
-						if (!pTKAlg->prepareTracking(strObjId, &img, &vRegions[i]))
+						if (!pTKAlg->prepareTracking(strObjId, &img, ANALYZER_TRACK_WINDOW, &vRegions[i]))
 							goto exit;
 						else
 							pTKAlg->setObjLeaveCallback(strObjId, sendData, &transfer);

@@ -59,13 +59,13 @@ void CTrackAlgTLD::release(void) {
 	m_mapRecvFeatures.clear();
 }
 
-bool CTrackAlgTLD::prepareTracking(string& objId, IplImage* img, CvRect* pTargetBox) {
+bool CTrackAlgTLD::prepareTracking(string& objId, IplImage* img, string stWinName, CvRect* pTargetBox) {
 	if (m_mapTrack.find(objId) == m_mapTrack.end()) {
 		m_errCode = obj_not_found;
 		return false;
 	}
 
-	m_mapTrack[objId]->prepareWork(img, pTargetBox);
+	m_mapTrack[objId]->prepareWork(img, stWinName, pTargetBox);
 
 	return true;
 }
