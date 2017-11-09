@@ -10,8 +10,7 @@ This README would normally document whatever steps are necessary to get your app
   3. An analyzer "AnalyzerTK" for showing the result.
   
 * TrackingManager:
-    *Responsible for maintaining all resources that will be dispatched to all cameras(e.g. IP camera) in the system, including     the object feature transferring and the data format definition etc. On the other hand, the entry/exit zone mapping  
-    function(algorithm) between those cameras will be implemented in this module soon.
+    * Responsible for maintaining all resources that will be dispatched to all cameras(e.g. IP camera) in the system, including the object feature transferring and the data format definition etc. On the other hand, the entry/exit zone mapping function(algorithm) between those cameras will be implemented in this module soon.
 
 * The Tracking Algorithm "TrackAlgTLD" implemented with an open source framework TLD(tracking-learning-detection) at present, and was built as a library for easy to replace. Now, this algorithm seems not good for object re-identification in multi-object tracking since its feature is not robust(only color histogram). I will try to add some new features or use other algorithm such as ELM for making it better. By the way, other tracking algorithm implemented yourself can replace this module; just build your tracking library with the name prefix "TrackAlg", and don't forget to inherit the TrackAlg class. For instance, in this case, "TrackAlgTLD".
 
