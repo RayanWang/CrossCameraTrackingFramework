@@ -28,7 +28,7 @@ This README would normally document whatever steps are necessary to get your app
 * Ex: TrackingManager -t 2 -m 4, which "-t" means how many cameras will be used and "-m" the max number of targets each camera can support.
 * After running TrackingManager, you can execute AnalyzerTK for tracking.
 
-### Parameter settings for AnalyzerTK###
+### Parameter settings for AnalyzerTK ###
 
 * "-c" : give the camera ID in integer.
 * "-k" : set up an interval in ms to keep tracking an object which disappeared from that moment.
@@ -36,7 +36,7 @@ This README would normally document whatever steps are necessary to get your app
 * "-r" : describe which tracking algorithm will be loaded (in this system will be "TLD").
 * "-v" : set up the IP camera URL.
 
-### For imrpovement###
+### For imrpovement ###
 
 * Now, this algorithm seems not good for object re-identification in multi-object tracking since its feature is not robust(only color histogram). I will try to add some new features or use other algorithm such as ELM for making it better.
 
